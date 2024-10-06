@@ -26,11 +26,10 @@ class UserTest extends TestCase
         $user = User::factory()->create();
 
         // ログインして会員一覧ページにアクセス
-        $this->actingAs($user);
-        $response = $this->get('/admin/users');
+        $response = $this->actingAs($user)->get('/admin/users');
 
         // 403 Forbidden ステータスが返される（権限がない場合）
-        $response->assertStatus(403);
+        $response->assertRedirect('admin/login');
     }
 
     public function test_admin_user_can_access_admin_user_list(): void
@@ -39,8 +38,8 @@ class UserTest extends TestCase
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
 
         // ログインして会員一覧ページにアクセス
-        $this->actingAs($adminUser);
-        $response = $this->get('/admin/users');
+        $response = $this->actingAs($adminUser,'admin')->get('/admin/users');
+
 
         // 200 OK ステータスが返される
         $response->assertStatus(200);
@@ -68,11 +67,10 @@ class UserTest extends TestCase
         $user = User::factory()->create();
 
         // ログインして会員詳細ページにアクセス
-        $this->actingAs($user);
-        $response = $this->get('/admin/users');  // 1は仮のユーザーID
+        $response = $this->actingAs($user)->get(route('admin.users.show', $user));
 
-        // 403 Forbidden ステータスが返される（権限がない場合）
-        $response->assertStatus(403);
+        // ログインページへリダイレクトされる
+        $response->assertRedirect('admin/login');
     }
 
     
@@ -82,9 +80,10 @@ class UserTest extends TestCase
         // 管理者ユーザーを作成してログイン
         $adminUser = User::factory()->create(['email' => 'admin@example.com']);
 
+        $user = User::factory()->create();
+
         // ログインして会員詳細ページにアクセス
-        $this->actingAs($adminUser);
-        $response = $this->get('/admin/users');  // 1は仮のユーザーID
+        $response = $this->actingAs($adminUser,'admin')->get(route('admin.users.show', $user)); 
 
         // 200 OK ステータスが返される
         $response->assertStatus(200);
