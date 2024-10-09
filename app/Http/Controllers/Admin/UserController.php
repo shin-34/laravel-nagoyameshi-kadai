@@ -13,7 +13,7 @@ class UserController extends Controller
         $keyword = $request->keyword;
 
         if ($keyword !== null) {
-            $users = User::where('name', 'like', "%{$keyword}%")->orwhere('lana', 'like', "%{$keyword}%")->paginate(15);
+            $users = User::where('name', 'like', "%{$keyword}%")->orwhere('kana', 'like', "%{$keyword}%")->paginate(15);
         } else {
             $users = User::paginate(15);
         }
