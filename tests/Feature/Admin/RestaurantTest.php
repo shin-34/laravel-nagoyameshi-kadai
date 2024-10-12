@@ -13,48 +13,168 @@ class RestaurantTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_access_restaurant_index()
+    //index
+    public function test_guest_cannot_access_restaurant_index()
     {
-        $response = $this->get(route('admin.restaurants.index'));
-        $response->assertStatus(200);
+        $response = $this->get('/admin/restaurants/index');
+        $response->assertRedirect('admin/login');
     }
 
-    public function test_user_can_access_restaurant_index()
+    public function test_user_cannot_access_restaurant_index()
     {
         $user = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.index'));
-        $response->assertStatus(200);
+        $response = $this->actingAs($user)->get('/admin/restaurants/index');
+        $response->assertRedirect('admin/login');
     }
 
-    public function test_admin_cannot_access_restaurant_index()
+    public function test_admin_can_access_restaurant_index()
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
-        $response = $this->actingAs($adminUser, 'admin')->get(route('admin.restaurants.index'));
-        $response->assertRedirect(route('admin.home'));
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/index');
+        $response->assertStatus(200);
     }
 
     // show
-    public function test_guest_can_access_restaurant_show()
+    public function test_guest_cannot_access_restaurant_show()
     {
         $restaurant = Restaurant::factory()->create();
-        $response = $this->get(route('admin.restaurants.show',$restaurant));
-        $response->assertStatus(200);
+        $response = $this->get('/admin/restaurants/show/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
     }
 
-    public function test_user_can_access_restaurant_show()
+    public function test_user_cannot_access_restaurant_show()
     {
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.show',$restaurant));
+        $response = $this->actingAs($user)->get('/admin/restaurants/show/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_access_restaurant_show()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/show/' . $restaurant->id);
         $response->assertStatus(200);
     }
 
-    public function test_admin_cannot_access_restaurant_show()
+
+    //create
+    public function test_guest_cannot_access_restaurant_create()
+    {
+        $response = $this->get('/admin/restaurants/create');
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_user_cannot_access_restaurant_create()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get('/admin/restaurants/create');
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_access_restaurant_create()
+    {
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/create');
+        $response->assertStatus(200);
+    }
+
+    //store
+    public function test_guest_cannot_store_restaurant()
+    {
+        $response = $this->post('/admin/restaurants/store');
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_user_cannot_store_restaurant()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post('/admin/restaurants/store');
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_store_restaurant()
+    {
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->post('/admin/restaurants/store', ['name' => 'New Restaurant Name']);
+        $response->assertStatus(200);
+    }
+
+
+    //edit
+    public function test_guest_cannot_access_restaurant_edit()
     {
         $restaurant = Restaurant::factory()->create();
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
-        $response = $this->actingAs($adminUser, 'admin')->get(route('admin.restaurants.show',$restaurant));
-        $response->assertRedirect(route('admin.home'));
+        $response = $this->get('/admin/restaurants/edit/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
     }
+
+    public function test_user_cannot_access_restaurant_edit()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get('/admin/restaurants/edit/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_access_restaurant_edit()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/edit/' . $restaurant->id);
+        $response->assertStatus(200);
+    }
+
+
+    //update
+    public function test_guest_cannot_update_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $response = $this->put('/admin/restaurants/update/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_user_cannot_update_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->put('/admin/restaurants/update/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_update_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->put('/admin/restaurants/update/' . $restaurant->id,  ['name' => 'Updated Restaurant Name']);
+        $response->assertStatus(200);
+    }
+
+
+    //destroy
+    public function test_guest_cannot_destroy_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $response = $this->delete('/admin/restaurants/destroy/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_user_cannot_destroy_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->delete('/admin/restaurants/destroy/' . $restaurant->id);
+        $response->assertRedirect('admin/login');
+    }
+
+    public function test_admin_can_destroy_restaurant()
+    {
+        $restaurant = Restaurant::factory()->create();
+        $admin = User::factory()->create(['email' => 'admin@example.com']);
+        $response = $this->actingAs($admin, 'admin')->delete('/admin/restaurants/destroy/' . $restaurant->id);
+        $response->assertStatus(200);
+    }
+
 
 }
