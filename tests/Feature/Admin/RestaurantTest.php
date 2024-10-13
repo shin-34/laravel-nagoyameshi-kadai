@@ -17,14 +17,14 @@ class RestaurantTest extends TestCase
     public function test_guest_cannot_access_restaurant_index()
     {
         $response = $this->get('/admin/restaurants/index');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_access_restaurant_index()
     {
         $user = User::factory()->create();
         $response = $this->actingAs($user)->get('/admin/restaurants/index');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_access_restaurant_index()
@@ -39,7 +39,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $response = $this->get('/admin/restaurants/show/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_access_restaurant_show()
@@ -47,7 +47,7 @@ class RestaurantTest extends TestCase
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
         $response = $this->actingAs($user)->get('/admin/restaurants/show/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_access_restaurant_show()
@@ -63,14 +63,14 @@ class RestaurantTest extends TestCase
     public function test_guest_cannot_access_restaurant_create()
     {
         $response = $this->get('/admin/restaurants/create');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_access_restaurant_create()
     {
         $user = User::factory()->create();
         $response = $this->actingAs($user)->get('/admin/restaurants/create');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_access_restaurant_create()
@@ -84,14 +84,14 @@ class RestaurantTest extends TestCase
     public function test_guest_cannot_store_restaurant()
     {
         $response = $this->post('/admin/restaurants/store');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_store_restaurant()
     {
         $user = User::factory()->create();
         $response = $this->actingAs($user)->post('/admin/restaurants/store');
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_store_restaurant()
@@ -107,7 +107,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $response = $this->get('/admin/restaurants/edit/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_access_restaurant_edit()
@@ -115,7 +115,7 @@ class RestaurantTest extends TestCase
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
         $response = $this->actingAs($user)->get('/admin/restaurants/edit/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_access_restaurant_edit()
@@ -132,7 +132,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $response = $this->put('/admin/restaurants/update/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_update_restaurant()
@@ -140,7 +140,7 @@ class RestaurantTest extends TestCase
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
         $response = $this->actingAs($user)->put('/admin/restaurants/update/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_update_restaurant()
@@ -157,7 +157,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $response = $this->delete('/admin/restaurants/destroy/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_destroy_restaurant()
@@ -165,7 +165,7 @@ class RestaurantTest extends TestCase
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
         $response = $this->actingAs($user)->delete('/admin/restaurants/destroy/' . $restaurant->id);
-        $response->assertRedirect('admin/login');
+        $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_destroy_restaurant()

@@ -28,12 +28,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
     Route::resource('users', Admin\UserController::class)->only(['index', 'show']);
 });
 
-Route::controller(RestaurantController::class)->group(function () {
-    Route::get('/admin/restaurants/index', 'index')->name('admin.restaurants.index');
-    Route::get('/admin/restaurants/show/{restaurant}', 'show')->name('admin.restaurants.show');
-    Route::get('/admin/restaurants/edit/{restaurant}', 'edit')->name('admin.restaurants.edit');
-    Route::get('/admin/restaurants/create', 'create')->name('admin.restaurants.create');
-    Route::post('/admin/restaurants/store', 'store')->name('admin.restaurants.store');
-    Route::delete('/admin/restaurants/{restaurant}', 'destroy')->name('admin.restaurants.destroy');
-    Route::patch('/admin/restaurants/show/{restaurant}', 'update')->name('admin.restaurants.update');
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
+    Route::resource('restaurants', Admin\RestaurantController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy']);
 });
