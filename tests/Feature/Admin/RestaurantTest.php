@@ -16,21 +16,21 @@ class RestaurantTest extends TestCase
     //index
     public function test_guest_cannot_access_restaurant_index()
     {
-        $response = $this->get('/admin/restaurants/index');
+        $response = $this->get('/admin/restaurants');
         $response->assertRedirect('/admin/login');
     }
 
     public function test_user_cannot_access_restaurant_index()
     {
         $user = User::factory()->create();
-        $response = $this->actingAs($user)->get('/admin/restaurants/index');
+        $response = $this->actingAs($user)->get('/admin/restaurants');
         $response->assertRedirect('/admin/login');
     }
 
     public function test_admin_can_access_restaurant_index()
     {
         $admin = User::factory()->create(['email' => 'admin@example.com']);
-        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/index');
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants');
         $response->assertStatus(200);
     }
 
@@ -38,7 +38,7 @@ class RestaurantTest extends TestCase
     public function test_guest_cannot_access_restaurant_show()
     {
         $restaurant = Restaurant::factory()->create();
-        $response = $this->get('/admin/restaurants/show/' . $restaurant->id);
+        $response = $this->get('/admin/restaurants/{$restaurant->id}');
         $response->assertRedirect('/admin/login');
     }
 
@@ -46,7 +46,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $user = User::factory()->create();
-        $response = $this->actingAs($user)->get('/admin/restaurants/show/' . $restaurant->id);
+        $response = $this->actingAs($user)->get('/admin/restaurants/{$restaurant->id}');
         $response->assertRedirect('/admin/login');
     }
 
@@ -54,7 +54,7 @@ class RestaurantTest extends TestCase
     {
         $restaurant = Restaurant::factory()->create();
         $admin = User::factory()->create(['email' => 'admin@example.com']);
-        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/show/' . $restaurant->id);
+        $response = $this->actingAs($admin, 'admin')->get('/admin/restaurants/{$restaurant->id}');
         $response->assertStatus(200);
     }
 

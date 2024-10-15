@@ -30,7 +30,7 @@ class RestaurantController extends Controller
     }
 
 
-    public function create()
+    public function create(Request $request)
     {
         return view('admin.restaurants.create');
     }
@@ -72,11 +72,7 @@ class RestaurantController extends Controller
         $restaurant->seating_capacity = $request->input('seating_capacity');
         $restaurant->save();
 
-        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids'));
-        $restaurant->regular_holidays()->sync($regular_holiday_ids);
-
-        $category_ids = array_filter($request->input('category_ids'));
-        $restaurant->categories()->sync($category_ids);
+        
 
         return redirect()->route('admin.restaurants.index')->with('flash_message', '店舗を登録しました。');
     }
