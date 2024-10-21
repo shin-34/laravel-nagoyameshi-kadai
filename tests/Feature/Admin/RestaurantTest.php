@@ -111,6 +111,12 @@ class RestaurantTest extends TestCase
         $admin->email = 'admin@example.com';
         $admin->password = Hash::make('nagoyameshi');
         $admin->save();
+
+        //追加
+        $categories = Category::factory()->count(3)->create();
+        $category_ids = $categories->pluck('id')->toArray();
+        $restaurant['category_ids'] = $category_ids;
+
         //$response = $this->actingAs($admin, 'admin')->post('/admin/restaurants', ['name' => 'New Restaurant Name']);
         $response = $this->actingAs($admin, 'admin')->post(route('admin.restaurants.store'), $restaurant);
         $response->assertRedirect('/admin/restaurants');
@@ -172,6 +178,11 @@ class RestaurantTest extends TestCase
         $admin->password = Hash::make('nagoyameshi');
         $admin->save();
 
+        //追加
+        $categories = Category::factory()->count(3)->create();
+        $category_ids = $categories->pluck('id')->toArray();
+        $restaurant['category_ids'] = $category_ids;
+
         $updateData = [
             'name' => '更新されたレストラン名',
             'description' => '更新された説明',
@@ -183,9 +194,13 @@ class RestaurantTest extends TestCase
             'closing_time' => '21:00:00',
             'seating_capacity' => 60,
         ];
+        //追加
+        $updateData['category_ids'] = $category_ids;
+
         //$response = $this->actingAs($admin, 'admin')->put('/admin/restaurants/update/' . $restaurant->id,  ['name' => 'Updated Restaurant Name']);
         $response = $this->actingAs($admin, 'admin')->put(route('admin.restaurants.update', $restaurant), $updateData);
         //~atは含まない
+        unset($updateData['category_ids']);
         unset($restaurant['updated_at'], $restaurant['created_at']);
         $this->assertDatabaseHas('restaurants', array_merge(['id' => $restaurant->id], $updateData));
         //「route('admin.restaurants.show', $restaurant)」は「/admin/restaurants/{restaurant}（例えば、/admin/restaurants/1）」
@@ -212,7 +227,7 @@ class RestaurantTest extends TestCase
     public function test_admin_can_destroy_restaurant()
     {
         $restaurant = Restaurant::factory()->create();
-        
+
         //$admin = User::factory()->create(['email' => 'admin@example.com']);
         $admin = new Admin();
         $admin->email = 'admin@example.com';
@@ -225,6 +240,5 @@ class RestaurantTest extends TestCase
     }
 
 
-    
 
 }
