@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Restaurant;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Category;
 
 class RestaurantTest extends TestCase
 {
@@ -187,7 +188,7 @@ class RestaurantTest extends TestCase
         //~atは含まない
         unset($restaurant['updated_at'], $restaurant['created_at']);
         $this->assertDatabaseHas('restaurants', array_merge(['id' => $restaurant->id], $updateData));
-        //「route('admin.restaurants.show', $restaurant)」は「/admin/restaurants/{restaurant}（例えば、/admin/restaurants/1）」に遷移
+        //「route('admin.restaurants.show', $restaurant)」は「/admin/restaurants/{restaurant}（例えば、/admin/restaurants/1）」
         $response->assertRedirect(route('admin.restaurants.show', $restaurant));
     }
 
@@ -223,5 +224,7 @@ class RestaurantTest extends TestCase
         $response->assertRedirect('/admin/restaurants');
     }
 
+
+    
 
 }
