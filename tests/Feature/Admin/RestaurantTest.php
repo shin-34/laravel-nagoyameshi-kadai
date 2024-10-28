@@ -226,7 +226,7 @@ class RestaurantTest extends TestCase
         }
     
         foreach ($regular_holiday_ids as $regular_holiday_id) {
-            $this->assertDatabaseHas('restaurant_regular_holiday', [
+            $this->assertDatabaseHas('regular_holiday_restaurant', [
                 'restaurant_id' => $restaurant->id,
                 'regular_holiday_id' => $regular_holiday_id,
             ]);
