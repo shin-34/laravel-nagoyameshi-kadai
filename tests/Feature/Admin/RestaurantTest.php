@@ -204,12 +204,10 @@ class RestaurantTest extends TestCase
             'opening_time' => '11:00:00',
             'closing_time' => '21:00:00',
             'seating_capacity' => 60,
+            'category_ids' => $category_ids,
+            'regular_holiday_ids' => $regular_holiday_ids,
         ];
-        //追加
-        $updateData['category_ids'] = $category_ids;
-        //追加2
-        $updateData['regularholiday_ids'] = $regular_holiday_ids;
-
+        
         //$response = $this->actingAs($admin, 'admin')->put('/admin/restaurants/update/' . $restaurant->id,  ['name' => 'Updated Restaurant Name']);
         $response = $this->actingAs($admin, 'admin')->put(route('admin.restaurants.update', $restaurant), $updateData);
         //~atは含まない
@@ -217,6 +215,22 @@ class RestaurantTest extends TestCase
         unset($updateData['regular_holiday_ids']);
         unset($restaurant['updated_at'], $restaurant['created_at']);
         $this->assertDatabaseHas('restaurants', array_merge(['id' => $restaurant->id], $updateData));
+
+        //AI先生
+        
+        foreach ($category_ids as $category_id) {
+            $this->assertDatabaseHas('category_restaurant', [
+                'restaurant_id' => $restaurant->id,
+                'category_id' => $category_id,
+            ]);
+        }
+    
+        foreach ($regular_holiday_ids as $regular_holiday_id) {
+            $this->assertDatabaseHas('restaurant_regular_holiday', [
+                'restaurant_id' => $restaurant->id,
+                'regular_holiday_id' => $regular_holiday_id,
+            ]);
+        }
         //「route('admin.restaurants.show', $restaurant)」は「/admin/restaurants/{restaurant}（例えば、/admin/restaurants/1）」
         $response->assertRedirect(route('admin.restaurants.show', $restaurant));
     }
