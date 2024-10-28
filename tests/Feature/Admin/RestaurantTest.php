@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\Restaurant;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Category;
+use App\Models\RegularHoliday;
 
 class RestaurantTest extends TestCase
 {
@@ -117,6 +118,11 @@ class RestaurantTest extends TestCase
         $category_ids = $categories->pluck('id')->toArray();
         $restaurant['category_ids'] = $category_ids;
 
+        //追加2
+        $regularholidays = RegularHoliday::factory()->count(3)->create();
+        $regular_holiday_ids = $regularholidays->pluck('id')->toArray();
+        $restaurant['regular_holiday_ids'] = $regular_holiday_ids;
+
         //$response = $this->actingAs($admin, 'admin')->post('/admin/restaurants', ['name' => 'New Restaurant Name']);
         $response = $this->actingAs($admin, 'admin')->post(route('admin.restaurants.store'), $restaurant);
         $response->assertRedirect('/admin/restaurants');
@@ -183,6 +189,11 @@ class RestaurantTest extends TestCase
         $category_ids = $categories->pluck('id')->toArray();
         $restaurant['category_ids'] = $category_ids;
 
+        //追加2
+        $regularholidays = RegularHoliday::factory()->count(3)->create();
+        $regular_holiday_ids = $regularholidays->pluck('id')->toArray();
+        $restaurant['regular_holiday_ids'] = $regular_holiday_ids;
+
         $updateData = [
             'name' => '更新されたレストラン名',
             'description' => '更新された説明',
@@ -196,11 +207,14 @@ class RestaurantTest extends TestCase
         ];
         //追加
         $updateData['category_ids'] = $category_ids;
+        //追加2
+        $updateData['regularholiday_ids'] = $regular_holiday_ids;
 
         //$response = $this->actingAs($admin, 'admin')->put('/admin/restaurants/update/' . $restaurant->id,  ['name' => 'Updated Restaurant Name']);
         $response = $this->actingAs($admin, 'admin')->put(route('admin.restaurants.update', $restaurant), $updateData);
         //~atは含まない
         unset($updateData['category_ids']);
+        unset($updateData['regular_holiday_ids']);
         unset($restaurant['updated_at'], $restaurant['created_at']);
         $this->assertDatabaseHas('restaurants', array_merge(['id' => $restaurant->id], $updateData));
         //「route('admin.restaurants.show', $restaurant)」は「/admin/restaurants/{restaurant}（例えば、/admin/restaurants/1）」
