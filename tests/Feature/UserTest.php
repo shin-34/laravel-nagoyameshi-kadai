@@ -2,92 +2,168 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Admin;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     */
-    public function test_guest_cannot_access_admin_user_list(): void
-    {
-        $response = $this->get('/admin/users');
 
+    //index
+    public function test_guest_cannot_access_user_index()
+    {
+        $response = $this->get('/user');
         $response->assertRedirect('/login');
     }
 
-    public function test_non_admin_user_cannot_access_admin_user_list(): void
+    public function test_user_can_access_user_index()
     {
-        // 一般ユーザーを作成してログイン
         $user = User::factory()->create();
-
-        // ログインして会員一覧ページにアクセス
-        $this->actingAs($user);
-        $response = $this->get('/admin/users');
-
-        // 403 Forbidden ステータスが返される（権限がない場合）
-        $response->assertStatus(403);
-    }
-
-    public function test_admin_user_can_access_admin_user_list(): void
-    {
-        // 管理者ユーザーを作成してログイン
-        $adminUser = User::factory()->create([
-            'is_admin' => true, // 管理者であることを示すフィールド
-        ]);
-
-        // ログインして会員一覧ページにアクセス
-        $this->actingAs($adminUser);
-        $response = $this->get('/admin/users');
-
-        // 200 OK ステータスが返される
+        $response = $this->actingAs($user)->get('/user');
         $response->assertStatus(200);
     }
 
-
-
-
-     //1. 未ログインユーザーが管理者側の会員詳細ページにアクセスできない
-    public function test_guest_cannot_access_admin_user_detail()
+    public function test_admin_cannot_access_user_index()
     {
-        // 任意のユーザーの詳細ページに未ログインでアクセス
-        $response = $this->get('/admin/users/1');  // 1は仮のユーザーID
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+        $response = $this->actingAs($admin, 'admin')->get('/user');
+        $response->assertRedirect('/admin/home');
+    }
 
-        // ログインページへリダイレクトされる
+
+
+    //edit
+    public function test_guest_cannot_access_user_edit()
+    {
+        $response = $this->get('/user/{$user->id}/edit');
         $response->assertRedirect('/login');
     }
 
-    
-     //2. ログイン済みの一般ユーザーが管理者側の会員詳細ページにアクセスできない
-    public function test_non_admin_user_cannot_access_admin_user_detail()
+    public function test_user_cannot_access_other_user_edit()
     {
-        // 一般ユーザーを作成してログイン
         $user = User::factory()->create();
-
-        // ログインして会員詳細ページにアクセス
-        $this->actingAs($user);
-        $response = $this->get('/admin/users/1');  // 1は仮のユーザーID
-
-        // 403 Forbidden ステータスが返される（権限がない場合）
-        $response->assertStatus(403);
+        $otheruser = User::factory()->create();
+        $response = $this->actingAs($user)->get("/user/{$otheruser->id}/edit");
+        $response->assertRedirect('/user');
     }
 
-    
-     //3. ログイン済みの管理者が管理者側の会員詳細ページにアクセスできる
-    public function test_admin_user_can_access_admin_user_detail()
+    public function test_user_can_access_user_edit()
     {
-        // 管理者ユーザーを作成してログイン
-        $adminUser = User::factory()->create();
-
-        // ログインして会員詳細ページにアクセス
-        $this->actingAs($adminUser);
-        $response = $this->get('/admin/users/1');  // 1は仮のユーザーID
-
-        // 200 OK ステータスが返される
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->get("/user/{$user->id}/edit");
         $response->assertStatus(200);
     }
+
+    public function test_admin_cannot_access_user_edit()
+    {
+        $user = User::factory()->create();
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+        $response = $this->actingAs($admin, 'admin')->get("/user/{$user->id}/edit");
+        $response->assertRedirect('/admin/home');
+    }
+
+
+
+    //update
+    public function test_guest_cannot_access_user_update()
+    {
+        $old_user = User::factory()->create();
+        $new_user_data = [
+            'name' => '更新されたユーザー名',
+            'kana' => 'コウシンサレタカナ',
+            'email' => 'user@example.com',
+            'postal_code' => '1111111',
+            'address' => '更新された住所',
+            'phone_number' => '11111111111',
+            'birthday' => '11111111',
+            'occupation' => '更新された職業',
+        ];
+
+        $response = $this->patch(route('user.update', $old_user), $new_user_data);
+
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect('/login');
+    }
+
+    public function test_user_cannot_access_other_user_update()
+    {
+        $user = User::factory()->create();
+        $otheruser = User::factory()->create();
+
+        $old_user = User::factory()->create();
+        $new_user_data = [
+            'name' => '更新されたユーザー名',
+            'kana' => 'コウシンサレタカナ',
+            'email' => 'user@example.com',
+            'postal_code' => '1111111',
+            'address' => '更新された住所',
+            'phone_number' => '11111111111',
+            'birthday' => '11111111',
+            'occupation' => '更新された職業',
+        ];
+
+        $response = $this->actingAs($user)->patch(route('user.update', $old_user), $new_user_data);
+
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect('/user');
+    }
+
+    public function test_user_can_access_user_update()
+    {
+        $user = User::factory()->create();
+        $otheruser = User::factory()->create();
+
+        $old_user = User::factory()->create();
+        $new_user_data = [
+            'name' => '更新されたユーザー名',
+            'kana' => 'コウシンサレタカナ',
+            'email' => 'user@example.com',
+            'postal_code' => '1111111',
+            'address' => '更新された住所',
+            'phone_number' => '11111111111',
+            'birthday' => '11111111',
+            'occupation' => '更新された職業',
+        ];
+
+        $response = $this->actingAs($user)->patch(route('user.update', $old_user), $new_user_data);
+
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect(route('user.index'));
+    }
+
+    public function test_admin_cannot_access_user_update()
+    {
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+
+        $old_user = User::factory()->create();
+        $new_user_data = [
+            'name' => '更新されたユーザー名',
+            'kana' => 'コウシンサレタカナ',
+            'email' => 'user@example.com',
+            'postal_code' => '1111111',
+            'address' => '更新された住所',
+            'phone_number' => '11111111111',
+            'birthday' => '11111111',
+            'occupation' => '更新された職業',
+        ];
+
+        $response = $this->actingAs($admin, 'admin')->patch(route('user.update', $old_user), $new_user_data);
+
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect('/admin/home');
+    }
+
 }
