@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -17,9 +18,7 @@ use App\Http\Controllers\Admin\CategoryController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 
 require __DIR__.'/auth.php';
@@ -43,4 +42,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
     Route::resource('terms', Admin\TermController::class)->only(['index', 'edit', 'update']);
+});
+
+//会員側
+Route::group(['middleware' => 'guest:admin'], function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 });
