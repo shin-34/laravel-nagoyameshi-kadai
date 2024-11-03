@@ -28,8 +28,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 });
 
 Route::group(['middleware' => 'guest:admin'], function (){
-    Route::resource('restaurants', RestaurantController::class)->only(['index']);
+    Route::resource('restaurants', RestaurantController::class)->only(['index', 'show']);
 });
+
+
+
 
 require __DIR__.'/auth.php';
 

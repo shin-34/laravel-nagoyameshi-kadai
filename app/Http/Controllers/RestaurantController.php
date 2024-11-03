@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
 {
+    //index
     public function index(Request $request)
     {
         $keyword = $request->input('keyword');
@@ -65,5 +66,12 @@ class RestaurantController extends Controller
             'total'
         ));
 
+    }
+
+
+    //show
+    public function show(Restaurant $restaurant)
+    {
+        return view('restaurants.show', compact('restaurant'));
     }
 }
