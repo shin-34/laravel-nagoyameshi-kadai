@@ -116,22 +116,22 @@ class SubscriptionTest extends TestCase
     public function test_guest_user_cannot_update_payment_method()
     {
         $request_parameter = ['paymentMethodId' => 'pm_card_mastercard'];
-        $response = $this->post(route('subscription.update', $request_parameter));
+        $response = $this->patch(route('subscription.update', $request_parameter));
         $response->assertRedirect(route('login'));
     }
     public function test_free_member_cannot_update_payment_method()
     {
         $user = User::factory()->create();
         $request_parameter = ['paymentMethodId' => 'pm_card_mastercard'];
-        $response = $this->actingAs($user)->post(route('subscription.update', $request_parameter));
-        $response->assertRedirect('/user');
+        $response = $this->actingAs($user)->patch(route('subscription.update', $request_parameter));
+        $response->assertRedirect(route('subscription.create'));
     }
     public function test_paid_member_can_update_payment_method()
     {
         $user = User::factory()->create();
         $user->newSubscription('premium_plan', 'price_1QHbClLapQ2Bq7OuFpmx4zay')->create('pm_card_visa');
         $request_parameter = ['paymentMethodId' => 'pm_card_mastercard'];
-        $response = $this->actingAs($user)->post(route('subscription.update', $request_parameter));
+        $response = $this->actingAs($user)->patch(route('subscription.update', $request_parameter));
         $default_payment_method_id = $user->defaultPaymentMethod()->id;
         $this->assertNotEquals($request_parameter['paymentMethodId'], $default_payment_method_id);
     }
@@ -143,7 +143,7 @@ class SubscriptionTest extends TestCase
         $admin->password = Hash::make('nagoyameshi');
         $admin->save();
         $request_parameter = ['paymentMethodId' => 'pm_card_mastercard'];
-        $response = $this->actingAs($admin, 'admin')->post(route('subscription.update', $request_parameter));
+        $response = $this->actingAs($admin, 'admin')->patch(route('subscription.update', $request_parameter));
         $response->assertRedirect('/admin/home');
     }
 
@@ -199,7 +199,7 @@ class SubscriptionTest extends TestCase
         $user->newSubscription('premium_plan', 'price_1QHbClLapQ2Bq7OuFpmx4zay')->create('pm_card_visa');
         $response = $this->actingAs($user)->delete(route('subscription.destroy'));
         $this->assertFalse($user->subscribed('premium_plan'));
-        $response->assertRedirect('/user');
+        $response->assertRedirect(route('home'));
     }
 
     public function test_admin_user_cannot_destroy_subscription()

@@ -10,11 +10,10 @@ class Subscribed
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()?->subscribed('premium_plan')) {
-
-            return $next($request);
+        if (! $request->user()?->subscribed('premium_plan')) {
+            return redirect('subscription/create');
         }
 
-        return redirect('subscription/create');
+        return $next($request);
     }
 }
