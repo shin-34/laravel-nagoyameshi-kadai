@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Admin\CategoryController;
 
 
@@ -32,32 +33,37 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('user', UserController::class)->only(['index', 'edit', 'update']);
 });
 
-Route::group(['middleware' => 'guest:admin'], function (){
+Route::group(['middleware' => 'guest:admin'], function () {
     Route::resource('restaurants', RestaurantController::class)->only(['index', 'show']);
 });
 
 //subscription
-Route::group(['middleware' => ['guest:admin', 'auth', 'verified', NotSubscribed::class]], function (){
+Route::group(['middleware' => ['guest:admin', 'auth', 'verified', NotSubscribed::class]], function () {
     Route::get('subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
     Route::post('subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
 });
 
-Route::group(['middleware' => ['guest:admin', 'auth', 'verified', Subscribed::class]], function (){
+Route::group(['middleware' => ['guest:admin', 'auth', 'verified', Subscribed::class]], function () {
     Route::get('subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
     Route::patch('subscription', [SubscriptionController::class, 'update'])->name('subscription.update');
     Route::get('subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
     Route::delete('subscription', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
 });
 
-Route::group(['middleware' => ['guest:admin', 'auth', 'verified']], function (){
+Route::group(['middleware' => ['guest:admin', 'auth', 'verified']], function () {
     Route::resource('restaurants.reviews', ReviewController::class)->only(['index']);
 });
 
-Route::group(['middleware' => ['guest:admin', 'auth', 'verified', Subscribed::class]], function (){
+Route::group(['middleware' => ['guest:admin', 'auth', 'verified', Subscribed::class]], function () {
     Route::resource('restaurants.reviews', ReviewController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/restaurants/{restaurant}/reservations/create', [ReservationController::class, 'create'])->name('restaurants.reservations.create');
+    Route::post('/restaurants/{restaurant}/reservations', [ReservationController::class, 'store'])->name('restaurants.reservations.store');
+    Route::delete('/restaurants/{restaurant}/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 
