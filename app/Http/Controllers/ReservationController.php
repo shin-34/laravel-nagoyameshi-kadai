@@ -52,14 +52,14 @@ class ReservationController extends Controller
 
 
     //destroy
-    public function destroy(Restaurant $restaurant, Reservation $reservation)
+    public function destroy(Reservation $reservation)
     {
         if ($reservation->user_id !== Auth::id()) {
-            return redirect()->route('reservations.index', $restaurant)->with('error_message', '不正なアクセスです。');
+            return redirect()->route('reservations.index')->with('error_message', '不正なアクセスです。');
         }
 
         $reservation->delete();
 
-        return redirect()->route('reservations.index', $restaurant)->with('flash_message', '予約をキャンセルしました。');
+        return redirect()->route('reservations.index')->with('flash_message', '予約をキャンセルしました。');
     }
 }

@@ -161,7 +161,7 @@ class ReservationTest extends TestCase
             'restaurant_id' => $restaurant->id,
             'user_id' => $user->id
         ]);
-        $response = $this->delete(route('reservations.destroy', [$restaurant, $reservation]));
+        $response = $this->delete(route('reservations.destroy', $reservation));
         $response->assertRedirect(route('login'));
     }
     public function test_free_user_cannot_destroy_reservation()
@@ -173,7 +173,7 @@ class ReservationTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $response = $this->actingAs($user)->delete(route('reservations.destroy', [$restaurant, $reservation]));
+        $response = $this->actingAs($user)->delete(route('reservations.destroy', $reservation));
         $this->assertDatabaseHas('reservations', ['id' => $reservation->id]);
         $response->assertRedirect(route('subscription.create'));
     }
@@ -188,9 +188,9 @@ class ReservationTest extends TestCase
             'user_id' => $otherUser->id
         ]);
 
-        $response = $this->actingAs($user)->delete(route('reservations.destroy', [$restaurant, $reservation]));
+        $response = $this->actingAs($user)->delete(route('reservations.destroy', $reservation));
         $this->assertDatabaseHas('reservations', ['id' => $reservation->id]);
-        $response->assertRedirect(route('reservations.index', $restaurant));
+        $response->assertRedirect(route('reservations.index'));
     }
 
     public function test_paid_user_can_destroy_own_reservation()
@@ -203,8 +203,8 @@ class ReservationTest extends TestCase
             'user_id' => $user->id
         ]);
 
-        $response = $this->actingAs($user)->delete(route('reservations.destroy', [$restaurant, $reservation]));
-        $response->assertRedirect(route('reservations.index', $restaurant));
+        $response = $this->actingAs($user)->delete(route('reservations.destroy', $reservation));
+        $response->assertRedirect(route('reservations.index'));
         $this->assertDatabaseMissing('reservations', [
             'id' => $reservation->id,
         ]);
@@ -222,7 +222,7 @@ class ReservationTest extends TestCase
             'restaurant_id' => $restaurant->id,
             'user_id' => $user->id
         ]);
-        $response = $this->actingAs($admin, 'admin')->delete(route('reservations.destroy', [$restaurant, $reservation]));
+        $response = $this->actingAs($admin, 'admin')->delete(route('reservations.destroy', $reservation));
         $this->assertDatabaseHas('reservations', ['id' => $reservation->id]);
         $response->assertRedirect('/admin/home');
     }
