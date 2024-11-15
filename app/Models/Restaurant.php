@@ -37,9 +37,8 @@ class Restaurant extends Model
     }
 
     //並べ替え機能をアップデート
-    public function popularSortable() {
-        $restaurants = Restaurant::withCount('reservations')->orderBy('reservations_count', 'desc')->get();
-        return $restaurants;
+    public function popularSortable($query, $direction) {
+        return $query->withCount('reservations')->orderBy('reservations_count', $direction);
     }
     
     public function favorited_users() {
